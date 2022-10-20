@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import ErrorPopup from './components/ErrorPopup';
 import Checkbox from '../../../../components/Checkbox';
 import SearchBox from '../../../../components/SearchBox';
@@ -11,9 +11,10 @@ import moreIcon from '../../../../assets/images/more.png';
 import './index.scss';
 import classNames from 'classnames';
 import LButton from '../../../../components/LButton';
-import { displayTime } from '../../../../utils';
+import { displayTime, profileIcons } from '../../../../utils';
 import React from 'react';
 import { invoke } from '@tauri-apps/api';
+import { AboutContext } from '../../../../context/AboutContext';
 
 interface IMinecraftProfile {
   id: string;
@@ -27,129 +28,6 @@ interface IMinecraftProfile {
   totalTimePlayed: number;
   dirName: string;
 }
-
-export const profileIcons = [
-  'Birch_Log',
-  'Birch_Planks',
-  'Block_of_Coal',
-  'Block_of_Diamond',
-  'Block_of_Emerald',
-  'Block_of_Gold',
-  'Block_of_Iron',
-  'Block_of_Netherite',
-  'Block_of_Redstone',
-  'Bookshelf',
-  'Bricks',
-  'Cake',
-  'Chest',
-  'Clay',
-  'Coal_Ore',
-  'Cobblestone',
-  'Command_Block',
-  'Copper_Block',
-  'Copper_Ore',
-  'Crafting_Table',
-  'Creeper_Head',
-  'Crimson_Planks',
-  'Crimson_Stem',
-  'Custom_BedrockGrass',
-  'Custom_Package',
-  'Dark_Oak_Leaves',
-  'Dark_Oak_Log',
-  'Dark_Oak_Planks',
-  'Deepslate',
-  'Deepslate_Coal_Ore',
-  'Deepslate_Copper_Ore',
-  'Deepslate_Diamond_Ore',
-  'Deepslate_Emerald_Ore',
-  'Deepslate_Gold_Ore',
-  'Deepslate_Iron_Ore',
-  'Deepslate_Lapis_Lazuli_Ore',
-  'Deepslate_Redstone_Ore',
-  'Diamond_Ore',
-  'Diorite',
-  'Dirt',
-  'Emerald_Ore',
-  'Enchanting_Table',
-  'End_Stone',
-  'Ender_Chest',
-  'Exposed_Copper_Block',
-  'Farmland',
-  'Flowering_Azalea_Leaves',
-  'Furnace',
-  'Glass',
-  'Glowstone',
-  'Gold_Ore',
-  'Granite',
-  'Grass_Block',
-  'Grass_Path',
-  'Gravel',
-  'Honey_Block',
-  'Ice',
-  'Iron_Ore',
-  'Jungle_Leaves',
-  'Jungle_Log',
-  'Jungle_Planks',
-  'Lapis_Lazuli_Ore',
-  'Lectern_Book',
-  'Light_Blue_Glazed_Terracotta',
-  'Lit_Furnace',
-  'Mangrove_Leaves',
-  'Mangrove_Log',
-  'Mangrove_Planks',
-  'Mycelium',
-  'Nether_Bricks',
-  'Nether_Quartz_Ore',
-  'Nether_Reactor_Core',
-  'Nether_Reactor_Core_Finished',
-  'Nether_Reactor_Core_Initialized',
-  'Nether_Wart_Block',
-  'Netherrack',
-  'Oak_Leaves',
-  'Oak_Log',
-  'Oak_Planks',
-  'Observer',
-  'Obsidian',
-  'Orange_Glazed_Terracotta',
-  'Oxidized_Copper_Block',
-  'Piston',
-  'Podzol',
-  'Pumpkin',
-  'Red_Sand',
-  'Red_Sandstone',
-  'Redstone_Ore',
-  'Sand',
-  'Sandstone',
-  'Skeleton_Skull',
-  'Slime_Block',
-  'Snow_Block',
-  'Snowy_Grass_Block',
-  'Soul_Sand',
-  'Spruce_Leaves',
-  'Spruce_Log',
-  'Spruce_Planks',
-  'Sticky_Piston',
-  'Stone',
-  'Terracotta',
-  'TNT',
-  'Tuff',
-  'Warped_Planks',
-  'Warped_Stem',
-  'Warped_Wart_Block',
-  'Water',
-  'Weathered_Copper_Block',
-  'White_Glazed_Terracotta',
-  'White_Wool',
-  'Xmas_Chest',
-  'Acacia_Leaves',
-  'Acacia_Log',
-  'Acacia_Planks',
-  'Ancient_Debris',
-  'Andesite',
-  'Azalea_Leaves',
-  'Bedrock',
-  'Birch_Leaves'
-];
 
 const InstallationItem: React.FC<{
   profile: IMinecraftProfile;
@@ -175,6 +53,8 @@ const InstallationItem: React.FC<{
     setShowTools(false);
   };
 
+  const { versionManifestV2 } = useContext(AboutContext);
+
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('blur', handleClickOutsideWindow);
@@ -199,7 +79,18 @@ const InstallationItem: React.FC<{
         </div>
         <div className="installation-info">
           <p>{profile.versionId === 'latest-release' ? 'Latest Release' : profile.versionId === 'latest-beta' ? 'Latest Beta' : profile.versionId === 'latest-preview' ? 'Latest Preview' : profile.name}</p>
-          <span>{profile.versionId}</span>
+          {versionManifestV2 != null && (
+            <span>
+              {profile.versionId === 'latest-release'
+                ? versionManifestV2.lastest.release
+                : profile.versionId === 'latest-beta'
+                ? versionManifestV2.lastest.beta
+                : profile.versionId === 'latest-preview'
+                ? versionManifestV2.lastest.preview
+                : profile.name}
+            </span>
+          )}
+          {versionManifestV2 == null && <span>{profile.versionId}</span>}
           <div className="playtime">
             {profile.lastTimePlayed > 0 && <p className="lasttime">Last Playtime: {displayTime(profile.lastTimePlayed)}</p>}
             {profile.totalTimePlayed > 0 && <p className="totaltime">Total Playtime: {displayTime(profile.totalTimePlayed)}</p>}

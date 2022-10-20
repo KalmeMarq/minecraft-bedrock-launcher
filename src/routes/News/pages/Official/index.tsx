@@ -22,6 +22,16 @@ export interface INews {
     url: string;
     title: string;
   };
+  text: string;
+  linkButton: {
+    kind: string;
+    label: string;
+    url: string;
+  };
+  playPageImage: {
+    url: string;
+    title: string;
+  };
 }
 
 const Official: React.FC = () => {
@@ -104,10 +114,10 @@ const Official: React.FC = () => {
                 href={n.readMoreLink}
                 target="_blank"
                 key={n.id}
-                style={{
-                  display:
-                    ((n.category === 'Minecraft: Java Edition' && showJava) || (n.category === 'Minecraft Dungeons' && showDungeons)) && (filterText === '' || n.title.toLowerCase().includes(filterText.toLowerCase())) ? 'block' : 'none'
-                }}
+                // style={{
+                //   display:
+                //     ((n.category === 'Minecraft: Java Edition' && showJava) || (n.category === 'Minecraft Dungeons' && showDungeons)) && (filterText === '' || n.title.toLowerCase().includes(filterText.toLowerCase())) ? 'block' : 'none'
+                // }}
               >
                 <div className="news-item-img">
                   <img src={'https://launchercontent.mojang.com/' + n.newsPageImage.url} alt={n.newsPageImage.title} />

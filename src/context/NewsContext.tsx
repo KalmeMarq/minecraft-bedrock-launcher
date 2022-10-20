@@ -15,6 +15,16 @@ export interface INews {
     url: string;
     title: string;
   };
+  text: string;
+  linkButton: {
+    kind: string;
+    label: string;
+    url: string;
+  };
+  playPageImage: {
+    url: string;
+    title: string;
+  };
 }
 
 export interface INewsForum {

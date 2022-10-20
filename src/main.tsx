@@ -5,6 +5,7 @@ import { setAppElement } from 'react-modal';
 import App from './App';
 import { AboutProvider } from './context/AboutContext';
 import { NewsProvider } from './context/NewsContext';
+import { NotificationsProvider } from './context/NotificatonsContext';
 import { PatchNotesProvider } from './context/PatchNotesContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { TranslationProvider } from './context/TranslationContext';
@@ -64,7 +65,9 @@ const Root = () => {
       <NewsProvider>
         <PatchNotesProvider>
           <SettingsProvider>
-            <App />
+            <NotificationsProvider>
+              <App />
+            </NotificationsProvider>
           </SettingsProvider>
         </PatchNotesProvider>
       </NewsProvider>

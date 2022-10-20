@@ -10,10 +10,26 @@ import News from './routes/News';
 import Settings from './routes/Settings';
 import Bedrock from './routes/Bedrock';
 import LauncherNewsDialog from './components/LauncherNewsDialog';
+import Notifications from './components/Notifications';
+import { INotification, NotificationsContext } from './context/NotificatonsContext';
+import { isDev } from './utils';
 
 function App() {
   const [showDialog, setShowDialog] = useState(false);
   const { app: appInfo } = useContext(AboutContext);
+  const { addNotification, removeNotification, hasNotification } = useContext(NotificationsContext);
+
+  if (isDev()) {
+    (window as any).addNotif = (notif: INotification) => {
+      addNotification(notif);
+    };
+    (window as any).delNotif = (id: string) => {
+      removeNotification(id);
+    };
+    (window as any).hasNotif = (id: string) => {
+      return hasNotification(id);
+    };
+  }
 
   return (
     <>
@@ -48,6 +64,7 @@ function App() {
             </Routes>
           </div>
         </div>
+        <Notifications />
       </HashRouter>
     </>
   );

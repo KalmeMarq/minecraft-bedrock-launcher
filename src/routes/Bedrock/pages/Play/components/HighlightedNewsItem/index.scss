@@ -1,0 +1,95 @@
+.hl-news-item {
+  background: hsl(0, 0%, 5%);
+  width: 700px;
+  display: flex;
+  height: 234px;
+  flex-direction: row;
+  height: max-content;
+  box-shadow: 0 4px 4px 0 #00000044;
+  position: relative;
+
+  &-inside {
+    width: 700px;
+    display: flex;
+    height: 234px;
+    position: relative;
+    flex-direction: row;
+  }
+
+  &.card-border .hl-news-item-inside::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: calc(100% - 10px);
+    top: 3px;
+    left: 3px;
+    height: calc(100% - 8px - 2px);
+    border: 2px solid #09834677;
+    z-index: 2;
+  }
+
+  .hlnews-tag-date {
+    padding: 0.6rem 0;
+  }
+  .hlnews-tag {
+    background: rgb(53, 53, 53);
+    font-family: 'Noto Sans';
+    font-weight: normal;
+    padding: 0.13rem 0.3rem;
+    font-size: 0.7rem;
+    margin-right: 5px;
+  }
+
+  .hlnews-date {
+    font-family: 'Noto Sans';
+    font-size: 11.4px;
+    font-weight: 100;
+    color:hsl(0, 0%, 80%)
+  }
+
+  img {
+    width: auto;
+    height: 100%;
+  }
+
+  .vertical-filler {
+    height: 100%;
+  }
+
+  .hl-news-item-cont {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    height: 234px;
+    justify-content: space-between;
+  }
+
+  &-cont {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: white;
+    padding: 1rem 1.6rem;
+
+    h3 {
+      font-family: 'MinecraftTen';
+      text-transform: uppercase;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 24px;
+    }
+
+    p {
+      font-family: 'Noto Sans';
+      font-size: 0.9rem;
+      color: hsl(0, 0%, 90%)
+    }
+  }
+
+  .wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 0 1rem;
+  }
+}

@@ -4,6 +4,8 @@
 
 ![news](./docs/news.png)
 
+![installations](./docs/installations.png)
+
 ![patch notes](./docs/patchnotes.png)
 
 ![general](./docs/general.png)
