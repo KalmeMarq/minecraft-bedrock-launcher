@@ -4,9 +4,21 @@
   height: 100%;
 
   .banner {
-    height: 100%;
-    filter: brightness(0.8);
-    box-shadow: inset 0px 0px 3px 3px #00000022;
+    height: 72%;
+    opacity: 0;
+    position: relative;
+    animation: opacbannerAnim 200ms ease-in forwards;
+    z-index: 1;
+  }
+
+  .bugrock-logo {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    translate: -50% 0;
+    width: 245px;
+    height: 42px;
+    animation: logoDownAnim 300ms ease-in-out forwards;
   }
 
   .bar {
@@ -15,6 +27,37 @@
     height: 56px;
     min-height: 56px;
     background: var(--play-bar-background);
-    box-shadow: 0px 1px 4px 4px #00000033;
+    box-shadow: 0px 0px 4px 4px #00000055;
+
+    & > * {
+      z-index: 2;
+    }
+  }
+}
+
+@keyframes logoDownAnim {
+  0% {
+    top: -22px;
+  }
+  45% {
+    top: 20px;
+  }
+  65% {
+    top: 16px;
+  }
+  85% {
+    top: 17px;
+  }
+  100% {
+    top: 18px;
+  }
+}
+
+@keyframes opacbannerAnim {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

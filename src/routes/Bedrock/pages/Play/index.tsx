@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import PlayButton from '../../../../components/PlayButton';
+import { ReactComponent as BedrockLogo } from '../../../../assets/images/bedrock_logo.svg';
 import { banners, SettingsContext } from '../../../../context/SettingsContext';
 import { T } from '../../../../context/TranslationContext';
 import './index.scss';
@@ -17,7 +18,9 @@ const Play: React.FC = () => {
           backgroundPosition: '50% 50%',
           backgroundSize: 'cover'
         }}
-      ></div>
+      >
+        <BedrockLogo className="bugrock-logo" />
+      </div>
       <div className="bar">
         <PlayButton disabled>
           <T>Play</T>

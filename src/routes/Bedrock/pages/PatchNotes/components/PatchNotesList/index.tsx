@@ -23,31 +23,27 @@ const PatchNotesList: React.FC<{ patchNotes: MinecraftPatchNote[]; showReleases?
       )}
       <div className="patch-list">
         {patchNotes.length === 0 && <LoadingSpinner />}
-        {patchNotes
-          // .sort((a, b) => {
-          //   return new Date(a.date).getTime() < new Date(b.date).getTime() ? 1 : -1;
-          // })
-          .map((note) => (
-            <PatchNoteCard
-              key={note.id}
-              patch={note}
-              style={{
-                display: (() => {
-                  if (!showReleases && !showBetas) return true;
-                  if (note.type === 'beta' && showBetas) return true;
-                  else if (note.type === 'preview' && showPreviews) return true;
-                  else if (note.type === 'release' && showReleases) return true;
-                  return false;
-                })()
-                  ? 'block'
-                  : 'none'
-              }}
-              onCardClick={(id) => {
-                setNoteSelected(patchNotes.find((p) => p.id === id) ?? null);
-                setShowPatchDialog(true);
-              }}
-            />
-          ))}
+        {patchNotes.map((note) => (
+          <PatchNoteCard
+            key={note.id}
+            patch={note}
+            style={{
+              display: (() => {
+                if (!showReleases && !showBetas && !showPreviews) return true;
+                if (note.type === 'beta' && showBetas) return true;
+                else if (note.type === 'preview' && showPreviews) return true;
+                else if (note.type === 'release' && showReleases) return true;
+                return false;
+              })()
+                ? 'block'
+                : 'none'
+            }}
+            onCardClick={(id) => {
+              setNoteSelected(patchNotes.find((p) => p.id === id) ?? null);
+              setShowPatchDialog(true);
+            }}
+          />
+        ))}
       </div>
     </>
   );

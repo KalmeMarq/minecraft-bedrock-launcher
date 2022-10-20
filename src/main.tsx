@@ -1,4 +1,5 @@
-import React from 'react';
+import { listen, UnlistenFn } from '@tauri-apps/api/event';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { setAppElement } from 'react-modal';
 import App from './App';
@@ -17,6 +18,7 @@ if (!isDev()) {
     if (e.code === 'F3') e.preventDefault();
     if (e.code === 'F7') e.preventDefault();
     if (e.code === 'KeyR' && e.ctrlKey) e.preventDefault();
+    if (e.code === 'F12') e.preventDefault();
   });
 }
 
@@ -25,6 +27,11 @@ document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.code === 'KeyU') e.preventDefault();
   if (e.ctrlKey && e.code === 'KeyF') e.preventDefault();
   if (e.ctrlKey && e.code === 'KeyG') e.preventDefault();
+
+  if (e.altKey && e.code === 'ArrowLeft') e.preventDefault();
+  if (e.altKey && e.code === 'ArrowRight') e.preventDefault();
+
+  if (e.ctrlKey && e.shiftKey && e.code === 'KeyC') e.preventDefault();
 });
 
 window.addEventListener('contextmenu', (e) => {
@@ -42,6 +49,16 @@ setAppElement('#root');
 const root = document.getElementById('root') as HTMLElement;
 
 const Root = () => {
+  useEffect(() => {
+    let unlisten = listen('test-event', (event) => {
+      console.log(event);
+    });
+
+    return () => {
+      unlisten.then((f) => f());
+    };
+  });
+
   return (
     <AboutProvider>
       <NewsProvider>

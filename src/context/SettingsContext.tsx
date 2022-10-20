@@ -1,27 +1,4 @@
 import React, { createContext, useEffect, useState } from 'react';
-import bannerWild from '../assets/banners/wild.jpg';
-import bannerCavesCliffs2 from '../assets/banners/caves_cliffs_two.jpg';
-import bannerCavesCliffs1 from '../assets/banners/caves_cliffs_one.jpg';
-import bannerNether from '../assets/banners/nether.jpg';
-import bannerBuzzyBees from '../assets/banners/buzzy_bees.jpg';
-import bannerVillagerPillager from '../assets/banners/villager_pillager.jpg';
-import bannerAquatic from '../assets/banners/aquatic.jpg';
-import bannerTechnically from '../assets/banners/technically.jpg';
-import bannerWorldColor from '../assets/banners/world_of_color.jpg';
-import bannerExploration from '../assets/banners/exploration.jpg';
-import bannerCombat from '../assets/banners/combat.jpg';
-import bannerCatsPandas from '../assets/banners/cats_and_pandas.jpg';
-import bannerEarlyLegacyConsole from '../assets/banners/early_console_era.jpg';
-import bannerLateLegacyConsole from '../assets/banners/late_legacy_console.jpg';
-import bannerMidLegacyConsole from '../assets/banners/mid_legacy_console.jpg';
-import bannerBedrockMaster from '../assets/banners/bedrock_master.jpg';
-import bannerBedrockStandard from '../assets/banners/bedrock_standard.jpg';
-import bannerIndieDays from '../assets/banners/indie_days.jpg';
-import bannerOriginal from '../assets/banners/original_image.jpg';
-import bannerBedrockJava from '../assets/banners/bedrock_java.jpg';
-import bannerBedrockJavaTechno from '../assets/banners/bedrock_java_technoblade.jpg';
-import bannerPocket from '../assets/banners/pocket_edition.jpg';
-
 import enGBTranslations from '../assets/translations/en-GB.json';
 import enUSTranslations from '../assets/translations/en-US.json';
 import ptPTTranslations from '../assets/translations/pt-PT.json';
@@ -42,117 +19,117 @@ export const banners = [
   {
     label: 'Latest Update',
     value: 'latest',
-    image: bannerWild
+    image: '/images/banners/wild.jpg'
   },
   {
     label: 'Wild Update',
     value: 'wild',
-    image: bannerWild
+    image: '/images/banners/wild.jpg'
   },
   {
     label: 'Caves & Cliffs (Part 2)',
     value: 'caves-cliffs-part-two',
-    image: bannerCavesCliffs2
+    image: '/images/banners/caves_cliffs_two.jpg'
   },
   {
     label: 'Caves & Cliffs (Part 1)',
     value: 'caves-cliffs-part-one',
-    image: bannerCavesCliffs1
+    image: '/images/banners/caves_cliffs_one.jpg'
   },
   {
     label: 'Nether Update',
     value: 'nether',
-    image: bannerNether
+    image: '/images/banners/nether.jpg'
   },
   {
     label: 'Buzzy Bees Update',
     value: 'buzzy-bees',
-    image: bannerBuzzyBees
+    image: '/images/banners/buzzy_bees.jpg'
   },
   {
     label: 'Villager & Pillager Update',
     value: 'villager-pillager',
-    image: bannerVillagerPillager
+    image: '/images/banners/villager_pillager.jpg'
   },
   {
     label: 'Update Aquatic',
     value: 'aquatic',
-    image: bannerAquatic
+    image: '/images/banners/aquatic.jpg'
   },
   {
     label: 'Technically Updated (Java)',
     value: 'technically-java',
-    image: bannerTechnically
+    image: '/images/banners/technically.jpg'
   },
   {
     label: 'World of Color Update (Java)',
     value: 'world-color-java',
-    image: bannerWorldColor
+    image: '/images/banners/world_of_color.jpg'
   },
   {
     label: 'Exploration Update (Java)',
     value: 'exploration-java',
-    image: bannerExploration
+    image: '/images/banners/exploration.jpg'
   },
   {
     label: 'Combat Update (Java)',
     value: 'combat-java',
-    image: bannerCombat
+    image: '/images/banners/combat.jpg'
   },
   {
     label: 'Cats & Pandas (Bedrock)',
     value: 'cats-pandas-bedrock',
-    image: bannerCatsPandas
+    image: '/images/banners/cats_and_pandas.jpg'
   },
   {
     label: 'Official Release (Bedrock)',
     value: 'official-release-bedrock',
-    image: bannerPocket
+    image: '/images/banners/pocket_edition.jpg'
   },
   {
     label: 'Bedrock & Java (Technoblade)',
     value: 'technoblade',
-    image: bannerBedrockJavaTechno
+    image: '/images/banners/bedrock_java_technoblade.jpg'
   },
   {
     label: 'Bedrock & Java',
     value: 'bedrock-java',
-    image: bannerBedrockJava
+    image: '/images/banners/bedrock_java.jpg'
   },
   {
     label: 'Bedrock Edition Standard',
     value: 'bedrock-standard',
-    image: bannerBedrockStandard
+    image: '/images/banners/bedrock_standard.jpg'
   },
   {
     label: 'Bedrock Edition Master',
     value: 'bedrock-master',
-    image: bannerBedrockMaster
+    image: '/images/banners/bedrock_master.jpg'
   },
   {
     label: 'Original Legacy Console Era',
     value: 'original-legacy-console',
-    image: bannerEarlyLegacyConsole
+    image: '/images/banners/early_legacy_console.jpg'
   },
   {
     label: 'Mid Legacy Console Era',
     value: 'mid-legacy-console',
-    image: bannerMidLegacyConsole
+    image: '/images/banners/mid_legacy_console.jpg'
   },
   {
     label: 'Late Legacy Console Era',
     value: 'late-legacy-console',
-    image: bannerLateLegacyConsole
+    image: '/images/banners/late_legacy_console.jpg'
   },
   {
     label: 'Indie Days',
     value: 'indie-days',
-    image: bannerIndieDays
+    image: '/images/banners/indie_days.jpg'
   },
   {
     label: 'Original',
     value: 'original',
-    image: bannerOriginal
+    image: '/images/banners/original_image.jpg'
   }
 ];
 

@@ -34,6 +34,18 @@ impl LauncherState {
     }
 }
 
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+  message: String,
+}
+
+#[tauri::command]
+async fn test_stuff(window: tauri::Window) -> Result<(), String> {
+    window.emit("test-event", Payload { message: "Event from rust".into() }).unwrap();
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
     create_launcher_dirs();
@@ -78,12 +90,15 @@ async fn main() {
             _ => {}
           })
         .invoke_handler(tauri::generate_handler![
+            test_stuff,
+            
             utils::get_news_minecraft,
             utils::get_news_minecraft_forum,
             utils::get_news_minecraft_top,
             utils::get_launcher_patch_notes,
             utils::get_bedrock_patch_notes,
             utils::get_version_manifest,
+            utils::get_version_manifest_v2,
             profiles::create_profile,
             profiles::delete_profile,
             profiles::update_profile,

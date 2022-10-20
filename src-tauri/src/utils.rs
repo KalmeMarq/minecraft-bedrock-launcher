@@ -5,7 +5,7 @@ use log4rs::config::RawConfig;
 use tauri::regex::Regex;
 
 pub fn get_launcher_path() -> PathBuf {
-    dirs::data_dir().unwrap().join(".minicraft_bedrock_launcher")
+    dirs::data_dir().unwrap().join(".minecraft_bedrock_launcher")
 }
 
 pub fn get_cache_path() -> PathBuf {

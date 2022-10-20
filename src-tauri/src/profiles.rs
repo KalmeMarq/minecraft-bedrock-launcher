@@ -42,37 +42,37 @@ pub struct LauncherProfiles {
 
 pub fn default_profiles() -> HashMap<String, Profile> {
     let lastest_release = Profile {
-        profile_type: "lastest-release".into(),
+        profile_type: "latest-release".into(),
         name: "".into(),
         icon: "Grass_Block".into(),
-        version_id: "lastest-release".into(),
+        version_id: "latest-release".into(),
         last_time_played: 0,
         total_time_played: 0,
-        dir_name: "Lastest Release".into(),
+        dir_name: "Latest Release".into(),
         created: OffsetDateTime::now_utc(),
         last_used: OffsetDateTime::now_utc(),
     };
 
     let lastest_beta = Profile {
-        profile_type: "lastest-beta".into(),
+        profile_type: "latest-beta".into(),
         name: "".into(),
         icon: "Crafting_Table".into(),
-        version_id: "lastest-beta".into(),
+        version_id: "latest-beta".into(),
         last_time_played: 0,
         total_time_played: 0,
-        dir_name: "Lastest Beta".into(),
+        dir_name: "Latest Beta".into(),
         created: OffsetDateTime::now_utc(),
         last_used: OffsetDateTime::now_utc(),
     };
 
     let lastest_preview = Profile {
-        profile_type: "lastest-preview".into(),
+        profile_type: "latest-preview".into(),
         name: "".into(),
         icon: "Grass_Path".into(),
-        version_id: "lastest-preview".into(),
+        version_id: "latest-preview".into(),
         last_time_played: 0,
         total_time_played: 0,
-        dir_name: "Lastest Preview".into(),
+        dir_name: "Latest Preview".into(),
         created: OffsetDateTime::now_utc(),
         last_used: OffsetDateTime::now_utc(),
     };
@@ -174,6 +174,7 @@ pub fn update_profile(state: tauri::State<LauncherState>, id: String, name: Opti
 pub fn duplicate_profile(state: tauri::State<LauncherState>, profile_id: String, duplicate_profile_id: String) -> ProfileResponse {
     if state.profiles.lock().unwrap().profiles.contains_key(&profile_id) {
         let mut profile = state.profiles.lock().unwrap().profiles.get_mut(&profile_id).unwrap().clone();
+        profile.profile_type = "custom".into();
         profile.total_time_played = 0;
         profile.last_time_played = 0;
 
