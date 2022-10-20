@@ -124,7 +124,7 @@
     margin-left: 2.2rem;
     padding: 0.45rem 0 0.5rem 0;
 
-      margin-right: 2.4rem;
+    margin-right: 2.4rem;
 
     li {
       list-style-type: disc;
@@ -135,8 +135,13 @@
       flex-direction: row;
 
       span {
-        font-size: 0.92rem;
-        color: #eee;
+        font-size: 0.94rem;
+        color: #fff;
+      }
+
+      a {
+        position: relative;
+        top: 1px;
       }
     }
 

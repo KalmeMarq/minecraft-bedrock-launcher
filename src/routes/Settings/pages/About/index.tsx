@@ -51,13 +51,13 @@ const About: React.FC = () => {
             <T>Credits and Third-party licenses</T>
           </h3>
           <p>
-            <T placeholders={['KalmeMarq']}>Developed by</T>:
+            <T>Developed by</T>:
           </p>
           <ul className="cred-list">
-            {credits.map((cred) => (
+            {credits.developed_by.map((cred) => (
               <li key={cred.name}>
                 <div className="cred-item">
-                  <span>{cred.name} - </span>
+                  <span>{cred.name}</span>
                   <div className="cred-links">
                     <a href={cred.github} target="_blank" rel="noopener noreferrer">
                       Github
@@ -70,6 +70,27 @@ const About: React.FC = () => {
               </li>
             ))}
           </ul>
+          <p>
+            <T>Special thanks to</T>:
+            <ul className="cred-list">
+              {credits.special_thanks.map((cred) => (
+                <li key={cred.name}>
+                  <div className="cred-item">
+                    <span>{cred.name}</span>
+                    <div className="cred-links">
+                      <a href={cred.github} target="_blank" rel="noopener noreferrer">
+                        Github
+                      </a>
+                      <a href={cred.twitter} target="_blank" rel="noopener noreferrer">
+                        Twitter
+                      </a>
+                    </div>
+                    <span>{cred.info}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </p>
           <div style={{ height: '10px' }}></div>
           <LButton
             text="Third-party licenses"
@@ -80,12 +101,6 @@ const About: React.FC = () => {
             }}
           />
         </div>
-        {/* <div className="divider"></div>
-        <div className="section links-section">
-          <h3>
-            <T>Links</T>
-          </h3>
-        </div> */}
       </div>
     </>
   );

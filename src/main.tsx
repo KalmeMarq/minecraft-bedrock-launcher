@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom/client';
 import { setAppElement } from 'react-modal';
 import App from './App';
 import { AboutProvider } from './context/AboutContext';
+import { NewsProvider } from './context/NewsContext';
+import { PatchNotesProvider } from './context/PatchNotesContext';
+import { SettingsProvider } from './context/SettingsContext';
 import { TranslationProvider } from './context/TranslationContext';
 import './fonts.scss';
 import './index.scss';
@@ -16,6 +19,13 @@ if (!isDev()) {
     if (e.code === 'KeyR' && e.ctrlKey) e.preventDefault();
   });
 }
+
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.code === 'KeyP') e.preventDefault();
+  if (e.ctrlKey && e.code === 'KeyU') e.preventDefault();
+  if (e.ctrlKey && e.code === 'KeyF') e.preventDefault();
+  if (e.ctrlKey && e.code === 'KeyG') e.preventDefault();
+});
 
 window.addEventListener('contextmenu', (e) => {
   e.preventDefault();
@@ -34,9 +44,13 @@ const root = document.getElementById('root') as HTMLElement;
 const Root = () => {
   return (
     <AboutProvider>
-      <TranslationProvider translation={{}}>
-        <App />
-      </TranslationProvider>
+      <NewsProvider>
+        <PatchNotesProvider>
+          <SettingsProvider>
+            <App />
+          </SettingsProvider>
+        </PatchNotesProvider>
+      </NewsProvider>
     </AboutProvider>
   );
 };

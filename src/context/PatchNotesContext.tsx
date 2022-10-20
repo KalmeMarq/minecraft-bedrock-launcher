@@ -1,4 +1,5 @@
-import { createContext, useState } from 'react';
+import { invoke } from '@tauri-apps/api';
+import { createContext, useEffect, useState } from 'react';
 
 export interface LauncherPatchNote {
   id: string;
@@ -14,13 +15,15 @@ export interface LauncherPatchNote {
 export interface MinecraftPatchNote {
   id: string;
   title: string;
-  version: string;
-  type: 'release' | 'beta';
-  image: {
+  type: 'release' | 'beta' | 'preview';
+  image?: {
     url: string;
     title: string;
   };
+  version: string;
+  date: string;
   body: string;
+  platforms: ('All' | 'Windows' | 'iOS' | 'Android' | 'Xbox' | 'Amazon' | 'Switch' | 'PS4')[];
 }
 
 export const PatchNotesContext = createContext<{
@@ -34,17 +37,21 @@ export const PatchNotesContext = createContext<{
 });
 
 export const PatchNotesProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [launcherPatchNotes, setLauncherPatchNotes] = useState<LauncherPatchNote[]>([
-    {
-      id: 'test-id',
-      date: '2022-10-19',
-      versions: {
-        windows: '0.1.0'
-      },
-      body: '<p>Initial release</p>'
-    }
-  ]);
+  const [launcherPatchNotes, setLauncherPatchNotes] = useState<LauncherPatchNote[]>([]);
   const [bedrockPatchNotes, setBedrockPatchNotes] = useState<MinecraftPatchNote[]>([]);
+
+  useEffect(() => {
+    if (launcherPatchNotes.length === 0)
+      invoke('get_launcher_patch_notes').then((data) => {
+        console.log(data);
+        setLauncherPatchNotes((data as { entries: LauncherPatchNote[] }).entries);
+      });
+
+    if (bedrockPatchNotes.length === 0)
+      invoke('get_bedrock_patch_notes').then((data) => {
+        setBedrockPatchNotes((data as { entries: MinecraftPatchNote[] }).entries);
+      });
+  }, []);
 
   async function refresh(file: string) {}
 

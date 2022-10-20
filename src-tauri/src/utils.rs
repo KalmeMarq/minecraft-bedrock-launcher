@@ -91,19 +91,25 @@ pub async fn get_news_minecraft_top() -> String {
 
 #[tauri::command]
 pub async fn get_launcher_patch_notes() -> serde_json::Value {
-    get_json_cached_file(get_cache_path().join("mqo"), "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/main/patchnotes/launcherPatchNotes.json", 60).await
+    get_json_cached_file(get_cache_path().join("mqo"), "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/launcherPatchNotes.json", 60).await
 }
 
 #[tauri::command]
 pub async fn get_bedrock_patch_notes() -> serde_json::Value {
     let pn_path = get_cache_path().join("nqro");
-    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/main/patchnotes/bedrockPatchNotes.json", 60).await
+    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/bedrockPatchNotes.json", 60).await
 }
 
 #[tauri::command]
 pub async fn get_version_manifest() -> serde_json::Value {
     let pn_path = get_versions_path().join("version_manifest.json");
-    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/main/version_manifest.json", 60).await
+    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest.json", 60).await
+}
+
+#[tauri::command]
+pub async fn get_version_manifest_v2() -> serde_json::Value {
+    let pn_path = get_versions_path().join("version_manifest_v2.json");
+    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest_v2.json", 60).await
 }
 
 pub async fn get_json_from_url(request_url: &str) -> serde_json::Value {

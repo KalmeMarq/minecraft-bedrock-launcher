@@ -22,15 +22,21 @@ fn default_theme() -> String {
     "dark".to_string()
 }
 
+fn default_banner_theme() -> String {
+    "latest".to_string()
+}
+
 fn default_ui_state() -> UIState {
     let pn_filter = PatchNotesFilter {
         releases: true,
+        previews: false,
         betas: false
     };
 
     let conf_filter = ConfigurationFilter {
         releases: true,
         betas: true,
+        previews: true,
         sort_by: SortBy::Name
     };
 
@@ -56,7 +62,9 @@ pub struct PatchNotesFilter {
     #[serde(default = "bool_true")]
     releases: bool,
     #[serde(default = "bool_true")]
-    betas: bool
+    betas: bool,
+    #[serde(default = "bool_true")]
+    previews: bool
 }
 
 impl PatchNotesFilter {
@@ -66,6 +74,10 @@ impl PatchNotesFilter {
 
     pub fn set_betas(&mut self, value: bool) {
         self.betas = value;
+    }
+
+    pub fn set_previews(&mut self, value: bool) {
+        self.previews = value;
     }
 }
 
@@ -92,6 +104,8 @@ pub struct ConfigurationFilter {
     releases: bool,
     #[serde(default = "bool_true")]
     betas: bool,
+    #[serde(default = "bool_true")]
+    previews: bool,
     #[serde(rename = "sortBy")]
     sort_by: SortBy
 }
@@ -111,6 +125,10 @@ impl ConfigurationFilter {
 
     pub fn set_betas(&mut self, value: bool) {
         self.betas = value;
+    }
+
+    pub fn set_previews(&mut self, value: bool) {
+        self.previews = value;
     }
 }
 
@@ -156,12 +174,12 @@ impl NewsFilter {
 pub struct LauncherSettings {
     #[serde(default = "bool_true")]
     keep_launcher_open: bool,
+    #[serde(default = "default_banner_theme")]
+    banner_theme: String,
     #[serde(default = "default_theme")]
     theme: String,
     #[serde(default = "default_language")]
     language: String,
-    #[serde(default)]
-    open_output_log: bool,
     #[serde(default)]
     animate_pages: bool,
     #[serde(default = "default_ui_state")]
@@ -169,14 +187,13 @@ pub struct LauncherSettings {
     news_filter: NewsFilter
 }
 
-
 impl Default for LauncherSettings {
     fn default() -> Self {
         LauncherSettings {
             keep_launcher_open: true,
+            banner_theme: default_banner_theme(),
             theme: default_theme(),
             language: default_language(),
-            open_output_log: false,
             animate_pages: false,
             bedrock: default_ui_state(),
             news_filter: default_news_filter()
@@ -195,16 +212,16 @@ impl LauncherSettings {
         }
     }
 
+    pub fn set_banner_theme(&mut self, value: &str) {
+        self.banner_theme = value.to_string();
+    }
+
     pub fn set_theme(&mut self, value: &str) {
         self.theme = value.to_string();
     }
 
     pub fn set_animate_pages(&mut self, value: bool) {
         self.animate_pages = value;
-    }
-
-    pub fn set_open_output_log(&mut self, value: bool) {
-        self.open_output_log = value;
     }
 }
 
@@ -225,7 +242,7 @@ fn parse_set_bool(val: &str) -> bool {
     }
 }
 
-static LANGUAGES: [&str; 4] = ["en-US", "en-GB", "pt-PT", "pt-BR"];
+static LANGUAGES: [&str; 6] = ["en-US", "en-GB", "pt-PT", "pt-BR", "es-ES", "es-MX"];
 
 #[tauri::command]
 pub fn set_setting(state: State<LauncherState>, option: &str, value: &str) {
@@ -233,15 +250,17 @@ pub fn set_setting(state: State<LauncherState>, option: &str, value: &str) {
 
     match option {
         "keepLauncherOpen" => state.settings.lock().unwrap().set_keep_launcher_open(parse_set_bool(value)),
+        "bannerTheme" => state.settings.lock().unwrap().set_banner_theme(value),
         "theme" => state.settings.lock().unwrap().set_theme(value),
         "language" => state.settings.lock().unwrap().set_language(value),
         "animatePages" => state.settings.lock().unwrap().set_animate_pages(parse_set_bool(value)),
-        "openOutputLog" => state.settings.lock().unwrap().set_open_output_log(parse_set_bool(value)),
         "bedrock:configurations/sortBy" => state.settings.lock().unwrap().bedrock.configurations.set_sort_by(value),
         "bedrock:configurations/releases" => state.settings.lock().unwrap().bedrock.configurations.set_releases(parse_set_bool(value)),
         "bedrock:configurations/betas" => state.settings.lock().unwrap().bedrock.configurations.set_betas(parse_set_bool(value)),
+        "bedrock:configurations/previews" => state.settings.lock().unwrap().bedrock.configurations.set_previews(parse_set_bool(value)),
         "bedrock:patchNotes/betas" => state.settings.lock().unwrap().bedrock.patch_notes.set_betas(parse_set_bool(value)),
         "bedrock:patchNotes/releases" => state.settings.lock().unwrap().bedrock.patch_notes.set_releases(parse_set_bool(value)),
+        "bedrock:patchNotes/previews" => state.settings.lock().unwrap().bedrock.patch_notes.set_previews(parse_set_bool(value)),
         "news:java" => state.settings.lock().unwrap().news_filter.set_java(parse_set_bool(value)),
         "news:bugrock" => state.settings.lock().unwrap().news_filter.set_bugrock(parse_set_bool(value)),
         "news:dungeons" => state.settings.lock().unwrap().news_filter.set_dungeons(parse_set_bool(value)),
@@ -254,15 +273,17 @@ pub fn set_setting(state: State<LauncherState>, option: &str, value: &str) {
 pub fn get_setting(state: State<LauncherState>, option: &str) -> String {
    match option {
        "keepLauncherOpen" => state.settings.lock().unwrap().keep_launcher_open.to_string(),
+       "bannerTheme" => state.settings.lock().unwrap().banner_theme.clone(),
        "theme" => state.settings.lock().unwrap().theme.clone(),
        "language" => state.settings.lock().unwrap().language.clone(),
        "animatePages" => state.settings.lock().unwrap().animate_pages.to_string(),
-       "openOutputLog" => state.settings.lock().unwrap().open_output_log.to_string(),
        "bedrock:configurations/sortBy" => state.settings.lock().unwrap().bedrock.configurations.sort_by.as_str().to_string(),
        "bedrock:configurations/releases" => state.settings.lock().unwrap().bedrock.configurations.releases.to_string(),
        "bedrock:configurations/betas" => state.settings.lock().unwrap().bedrock.configurations.betas.to_string(),
+       "bedrock:configurations/previews" => state.settings.lock().unwrap().bedrock.configurations.previews.to_string(),
        "bedrock:patchNotes/releases" => state.settings.lock().unwrap().bedrock.patch_notes.releases.to_string(),
        "bedrock:patchNotes/betas" => state.settings.lock().unwrap().bedrock.patch_notes.betas.to_string(),
+       "bedrock:patchNotes/previews" => state.settings.lock().unwrap().bedrock.patch_notes.previews.to_string(),
        "news:java" => state.settings.lock().unwrap().news_filter.java.to_string(),
        "news:bugrock" => state.settings.lock().unwrap().news_filter.bugrock.to_string(),
        "news:dungeons" => state.settings.lock().unwrap().news_filter.dungeons.to_string(),
