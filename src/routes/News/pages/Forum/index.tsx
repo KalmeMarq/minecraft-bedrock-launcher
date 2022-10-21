@@ -6,6 +6,7 @@ import { NewsContext } from '../../../../context/NewsContext';
 import { T } from '../../../../context/TranslationContext';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import { formatDateNews, generateRandomStr } from '../../../../utils';
+import NewsItem from '../../components/NewsItem';
 
 const Forum: React.FC = () => {
   const { t } = useTranslation();
@@ -32,25 +33,12 @@ const Forum: React.FC = () => {
           </div>
         </div>
       </div>
-      <div style={{ width: '100%', background: 'var(--divider)', height: '1px' }}></div>
+      <div style={{ width: '100%', background: 'var(--divider)', height: '1px', minHeight: '1px' }}></div>
       <div className="news-list">
         <div className="news-list-inside">
-          {news.map((n) => {
-            return (
-              <a className={classNames('news-item')} href={n.readMoreLink} target="_blank" key={n.id} style={{ display: 'block' }}>
-                <div className="news-item-img news-item-img-forum">
-                  <img src={n.newsPageImage.url} alt={n.newsPageImage.title} />
-                </div>
-                <div className="news-item-cont">
-                  <h3>{n.title}</h3>
-                  <div className="wrapper">
-                    <span className="cat">Minecraft</span>
-                    <span className="date">{formatDateNews(n.date)}</span>
-                  </div>
-                </div>
-              </a>
-            );
-          })}
+          {news.map((n) => (
+            <NewsItem key={n.id} newsData={n} className="forum" />
+          ))}
         </div>
       </div>
     </div>

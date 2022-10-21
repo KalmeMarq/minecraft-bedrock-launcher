@@ -4,21 +4,37 @@
   background: none;
   cursor: pointer;
   text-decoration: none;
+  min-height: 32px;
   
   .inner {
     display: flex;
     place-items: center;
     place-content: center;
-    padding: 1px 1.1rem 0;
+    padding: 1px 1.2rem 0;
     color: white;
     border: 1px solid #717171;
-    font-weight: 550;
-    font-size: 0.79rem;
     height: 32px;
+    font-size: 12px;
+    font-family: sans-serif;
+    font-weight: 550;
+  }
+
+  span {
+    -webkit-font-smoothing: antialiased;
+    transform: translate3d(0, 0, 0);
+    translate: 0 0;
+    position: relative;
   }
 
   &.iconned .inner {
-    padding: 0.35rem 0.5rem;
+    padding: 0.25rem 0.4rem;
+
+    img {
+      image-rendering: crisp-edges;
+      image-rendering: pixelated;
+      height: 19px;
+      width: 19px;
+    }
   }
 
   &.green .inner {

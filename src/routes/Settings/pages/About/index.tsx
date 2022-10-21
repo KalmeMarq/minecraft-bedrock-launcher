@@ -72,25 +72,25 @@ const About: React.FC = () => {
           </ul>
           <p>
             <T>Special thanks to</T>:
-            <ul className="cred-list">
-              {credits.special_thanks.map((cred) => (
-                <li key={cred.name}>
-                  <div className="cred-item">
-                    <span>{cred.name}</span>
-                    <div className="cred-links">
-                      <a href={cred.github} target="_blank" rel="noopener noreferrer">
-                        Github
-                      </a>
-                      <a href={cred.twitter} target="_blank" rel="noopener noreferrer">
-                        Twitter
-                      </a>
-                    </div>
-                    <span>{cred.info}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
           </p>
+          <ul className="cred-list">
+            {credits.special_thanks.map((cred) => (
+              <li key={cred.name}>
+                <div className="cred-item">
+                  <span>{cred.name}</span>
+                  <div className="cred-links">
+                    <a href={cred.github} target="_blank" rel="noopener noreferrer">
+                      Github
+                    </a>
+                    <a href={cred.twitter} target="_blank" rel="noopener noreferrer">
+                      Twitter
+                    </a>
+                  </div>
+                  <span>{cred.info}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
           <div style={{ height: '10px' }}></div>
           <LButton
             text="Third-party licenses"

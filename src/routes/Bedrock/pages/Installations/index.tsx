@@ -6,15 +6,13 @@ import Select from '../../../../components/Select';
 import { T } from '../../../../context/TranslationContext';
 import Tooltip from '../../../../components/Tooltip';
 import { useTranslation } from '../../../../hooks/useTranslation';
-import folderIcon from '../../../../assets/images/folder.png';
-import moreIcon from '../../../../assets/images/more.png';
 import './index.scss';
-import classNames from 'classnames';
 import LButton from '../../../../components/LButton';
-import { displayTime, profileIcons } from '../../../../utils';
 import React from 'react';
 import { invoke } from '@tauri-apps/api';
-import { AboutContext } from '../../../../context/AboutContext';
+import CreateDialog from './components/CreateDialog';
+import EditDialog from './components/EditDialog';
+import InstallationItem from './components/InstallationItem';
 
 interface IMinecraftProfile {
   id: string;
@@ -29,142 +27,13 @@ interface IMinecraftProfile {
   dirName: string;
 }
 
-const InstallationItem: React.FC<{
-  profile: IMinecraftProfile;
-  onSelect?: (profile: IMinecraftProfile) => void;
-  onPlay?: (profile: IMinecraftProfile) => void;
-  onFolder?: (profile: IMinecraftProfile) => void;
-  onEdit?: (profile: IMinecraftProfile) => void;
-  onDuplicate?: (profile: IMinecraftProfile) => void;
-  onDelete?: (profile: IMinecraftProfile) => void;
-}> = ({ profile, onSelect, onPlay, onDelete, onDuplicate, onEdit, onFolder }) => {
-  const [showTools, setShowTools] = useState(false);
-
-  const tRef = useRef(null);
-
-  const handleClickOutside = (ev: MouseEvent) => {
-    // @ts-ignore
-    if (tRef.current && !tRef.current.contains(ev.target)) {
-      setShowTools(false);
-    }
-  };
-
-  const handleClickOutsideWindow = (ev: FocusEvent) => {
-    setShowTools(false);
-  };
-
-  const { versionManifestV2 } = useContext(AboutContext);
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('blur', handleClickOutsideWindow);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('blur', handleClickOutsideWindow);
-    };
-  }, []);
-
-  return (
-    <div className={classNames('installation-item', { '_has-bottom': profile.lastTimePlayed > 0 || profile.totalTimePlayed > 0 })}>
-      <div
-        tabIndex={0}
-        className="installation-btn"
-        onClick={() => {
-          if (onSelect) onSelect(profile);
-        }}
-      >
-        <div className="installation-icon">
-          <img src={profile.icon.startsWith('data:image/') ? profile.icon : profileIcons.includes(profile.icon) ? '/images/installation_icons/' + profile.icon + '.png' : '/images/installation_icons/Furnace.png'} alt="icon" />
-        </div>
-        <div className="installation-info">
-          <p>{profile.versionId === 'latest-release' ? 'Latest Release' : profile.versionId === 'latest-beta' ? 'Latest Beta' : profile.versionId === 'latest-preview' ? 'Latest Preview' : profile.name}</p>
-          {versionManifestV2 != null && (
-            <span>
-              {profile.versionId === 'latest-release'
-                ? versionManifestV2.lastest.release
-                : profile.versionId === 'latest-beta'
-                ? versionManifestV2.lastest.beta
-                : profile.versionId === 'latest-preview'
-                ? versionManifestV2.lastest.preview
-                : profile.name}
-            </span>
-          )}
-          {versionManifestV2 == null && <span>{profile.versionId}</span>}
-          <div className="playtime">
-            {profile.lastTimePlayed > 0 && <p className="lasttime">Last Playtime: {displayTime(profile.lastTimePlayed)}</p>}
-            {profile.totalTimePlayed > 0 && <p className="totaltime">Total Playtime: {displayTime(profile.totalTimePlayed)}</p>}
-          </div>
-        </div>
-        <div className="installation-item-tools">
-          <LButton
-            text="Play"
-            type="green"
-            onClick={(e) => {
-              e.preventDefault();
-              if (onPlay) onPlay(profile);
-            }}
-          />
-          <LButton
-            icon={folderIcon}
-            onClick={(e) => {
-              e.preventDefault();
-              if (onFolder) onFolder(profile);
-            }}
-          />
-          <LButton
-            icon={moreIcon}
-            onClick={(e) => {
-              e.preventDefault();
-              setShowTools(true);
-            }}
-          />
-          {showTools && (
-            <div ref={tRef} className="edit-tools">
-              <button
-                className="edit-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowTools(false);
-                  if (onEdit) onEdit(profile);
-                }}
-              >
-                <T>Edit</T>
-              </button>
-              <button
-                className="edit-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowTools(false);
-                  if (onDuplicate) onDuplicate(profile);
-                }}
-              >
-                <T>Duplicate</T>
-              </button>
-              {profile.type === 'custom' && (
-                <button
-                  className="edit-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowTools(false);
-                    if (onDelete) onDelete(profile);
-                  }}
-                >
-                  <T>Delete</T>
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const Installations: React.FC = () => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [errorDialogTitle, setErrorDialogTitle] = useState('');
   const [errorDialogMsg, setErrorDialogMsg] = useState('');
+
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
 
   const [profiles, setProfiles] = useState<IMinecraftProfile[]>([
     {
@@ -212,6 +81,18 @@ const Installations: React.FC = () => {
 
   return (
     <>
+      <CreateDialog
+        isOpen={showCreateDialog}
+        onClose={() => {
+          setShowCreateDialog(false);
+        }}
+      />
+      <EditDialog
+        isOpen={showEditDialog}
+        onClose={() => {
+          setShowEditDialog(false);
+        }}
+      />
       <ErrorPopup title={errorDialogTitle.length === 0 ? 'Error' : errorDialogTitle} message={errorDialogMsg} isOpen={showErrorDialog} onClose={() => setShowErrorDialog(false)} />
       <div className="installations">
         <div className="installs-filters">
@@ -280,7 +161,7 @@ const Installations: React.FC = () => {
         <div className="installations-list">
           <div className="create-btn">
             <div className="create-btn-inside">
-              <LButton text="New installation" />
+              <LButton text="New installation" onClick={() => setShowCreateDialog(true)} />
             </div>
           </div>
           <div className="divider"></div>
@@ -307,7 +188,9 @@ const Installations: React.FC = () => {
                   profile={profile}
                   onSelect={() => {}}
                   onPlay={() => {}}
-                  onEdit={() => {}}
+                  onEdit={() => {
+                    setShowEditDialog(true);
+                  }}
                   onDuplicate={() => {
                     invoke<{ message?: string; title?: string; success: boolean }>('duplicate_profile', { profileId: profile.id + 'm', duplicateProfileId: crypto.randomUUID().replace(/-/g, '') }).then((res) => {
                       if (res.success) {

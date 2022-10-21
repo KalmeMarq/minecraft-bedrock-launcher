@@ -43,7 +43,6 @@ export const PatchNotesProvider: React.FC<React.PropsWithChildren> = ({ children
   useEffect(() => {
     if (launcherPatchNotes.length === 0)
       invoke('get_launcher_patch_notes').then((data) => {
-        console.log(data);
         setLauncherPatchNotes((data as { entries: LauncherPatchNote[] }).entries);
       });
 

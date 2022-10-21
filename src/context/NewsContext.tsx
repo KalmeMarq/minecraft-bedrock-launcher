@@ -5,23 +5,23 @@ import { generateRandomStr } from '../utils';
 export interface INews {
   id: string;
   title: string;
-  tag: string;
-  category: 'Minecraft: Java Edition' | 'Minecraft Dungeons' | 'Minecraft for Windows' | 'Minecraft Legends';
+  tag?: string;
+  category?: 'Minecraft: Java Edition' | 'Minecraft Dungeons' | 'Minecraft for Windows' | 'Minecraft Legends';
   date: string;
   readMoreLink: string;
-  newsType: ('News page' | 'Java' | 'Dungeons' | 'Bedrock' | 'Legends')[];
+  newsType?: ('News page' | 'Java' | 'Dungeons' | 'Bedrock' | 'Legends')[];
   cardBorder?: boolean;
   newsPageImage: {
     url: string;
     title: string;
   };
-  text: string;
-  linkButton: {
+  text?: string;
+  linkButton?: {
     kind: string;
     label: string;
     url: string;
   };
-  playPageImage: {
+  playPageImage?: {
     url: string;
     title: string;
   };
@@ -67,11 +67,11 @@ export function parseForumNews(rawDoc: string) {
   return news;
 }
 
-export function parseTopNews(rawDoc: string) {
+export function parseTopNews(rawDoc: string): INews[] {
   const doc = new DOMParser().parseFromString(rawDoc, 'text/xml');
   const channel = doc.getElementsByTagName('channel')[0];
 
-  const news: INewsForum[] = [];
+  const news: INews[] = [];
 
   for (const item of channel.getElementsByTagName('item')) {
     const title = item.getElementsByTagName('title')[0].textContent;
@@ -98,8 +98,8 @@ export function parseTopNews(rawDoc: string) {
 
 export const NewsContext = createContext<{
   minecraft: INews[];
-  minecraftForum: INewsForum[];
-  minecraftTop: INewsForum[];
+  minecraftForum: INews[];
+  minecraftTop: INews[];
 }>({
   minecraft: [],
   minecraftForum: [],
@@ -108,8 +108,8 @@ export const NewsContext = createContext<{
 
 export const NewsProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [minecraftNews, setMinecraftNews] = useState<INews[]>([]);
-  const [minecraftForumNews, setMinecraftForumNews] = useState<INewsForum[]>([]);
-  const [minecraftTopNews, setMinecraftTopNews] = useState<INewsForum[]>([]);
+  const [minecraftForumNews, setMinecraftForumNews] = useState<INews[]>([]);
+  const [minecraftTopNews, setMinecraftTopNews] = useState<INews[]>([]);
 
   useEffect(() => {
     if (minecraftNews.length === 0) {
@@ -120,13 +120,13 @@ export const NewsProvider: React.FC<React.PropsWithChildren> = ({ children }) =>
 
     if (minecraftForumNews.length === 0) {
       invoke('get_news_minecraft_forum').then((rawDoc) => {
-        setMinecraftForumNews(parseForumNews(rawDoc as string));
+        setMinecraftForumNews(parseForumNews(rawDoc as string) as INews[]);
       });
     }
 
     if (minecraftTopNews.length === 0) {
       invoke('get_news_minecraft_top').then((rawDoc) => {
-        setMinecraftTopNews(parseTopNews(rawDoc as string));
+        setMinecraftTopNews(parseTopNews(rawDoc as string) as INews[]);
       });
     }
   }, []);

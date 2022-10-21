@@ -26,11 +26,14 @@
     }
 
     p {
+      position: relative;
       font-family: 'Noto Sans';
-      color: #BEBEBE;
+      color: #b4b4b4;
       font-size: 0.75rem;
       padding: 0.04rem 0;
-      width: max-content;
+      width: max-content; 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 550;
     }
   }
 
@@ -137,6 +140,8 @@
       span {
         font-size: 0.94rem;
         color: #fff;
+        width: max-content;
+        min-width: max-content;
       }
 
       a {

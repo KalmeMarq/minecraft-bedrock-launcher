@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import { FC } from 'react';
+import { INews } from '../../../../../../context/NewsContext';
 import { formatDateNews } from '../../../../../../utils';
-import { INews } from '../../../../../News/pages/Official';
 import './index.scss';
 
 const HighlightedNewsItem: FC<{
@@ -10,7 +10,7 @@ const HighlightedNewsItem: FC<{
   return (
     <div className={classNames('hl-news-item', { 'card-border': data.cardBorder })}>
       <div className="hl-news-item-inside">
-        <img src={'https://launchercontent.mojang.com' + data.playPageImage.url} alt="" />
+        <img src={'https://launchercontent.mojang.com' + data.playPageImage?.url} alt="" />
         <div className="hl-news-item-cont">
           <div>
             <h3>{data.title}</h3>
@@ -26,7 +26,9 @@ const HighlightedNewsItem: FC<{
             </a>
             {data.linkButton && (
               <a className="bordered-btn green" href={data.linkButton.url} target="_blank">
-                <div className="inner">{data.linkButton.label}</div>
+                <div className="inner">
+                  <span>{data.linkButton.label}</span>
+                </div>
               </a>
             )}
           </div>

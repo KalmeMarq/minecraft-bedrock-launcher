@@ -7,6 +7,7 @@ import { NewsContext } from '../../../../context/NewsContext';
 import { T } from '../../../../context/TranslationContext';
 import { useTranslation } from '../../../../hooks/useTranslation';
 import { formatDateNews } from '../../../../utils';
+import NewsItem from '../../components/NewsItem';
 import './index.scss';
 
 export interface INews {
@@ -107,31 +108,9 @@ const Official: React.FC = () => {
       <div style={{ width: '100%', background: 'var(--divider)', minHeight: '1px' }}></div>
       <div className="news-list">
         <div className="news-list-inside">
-          {news.map((n) => {
-            return (
-              <a
-                className={classNames('news-item', { 'card-border': n.cardBorder })}
-                href={n.readMoreLink}
-                target="_blank"
-                key={n.id}
-                // style={{
-                //   display:
-                //     ((n.category === 'Minecraft: Java Edition' && showJava) || (n.category === 'Minecraft Dungeons' && showDungeons)) && (filterText === '' || n.title.toLowerCase().includes(filterText.toLowerCase())) ? 'block' : 'none'
-                // }}
-              >
-                <div className="news-item-img">
-                  <img src={'https://launchercontent.mojang.com/' + n.newsPageImage.url} alt={n.newsPageImage.title} />
-                </div>
-                <div className="news-item-cont">
-                  <h3>{n.title}</h3>
-                  <div className="wrapper">
-                    <span className="cat">{n.newsType.includes('Java') && n.newsType.includes('Bedrock') ? 'Minecraft: Java & Bedrock' : n.category}</span>
-                    <span className="date">{formatDateNews(n.date)}</span>
-                  </div>
-                </div>
-              </a>
-            );
-          })}
+          {news.map((n) => (
+            <NewsItem key={n.id} contentUrl="https://launchercontent.mojang.com/" newsData={n} />
+          ))}
         </div>
       </div>
     </div>

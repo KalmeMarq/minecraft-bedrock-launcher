@@ -19,7 +19,7 @@ const Select: React.FC<SelectProps> = ({ defaultValue, width = '100%', noBackgro
   const dropRef = useRef<HTMLDivElement>(null);
 
   const handleOpen = () => {
-    setOpen(!open);
+    setOpen(true);
   };
 
   const handleSelect = (index: number, value: string) => {

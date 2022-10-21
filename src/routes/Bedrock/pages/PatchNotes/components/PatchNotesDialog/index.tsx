@@ -12,9 +12,7 @@ const PatchNotesDialog: React.FC<{ patch: MinecraftPatchNote; isOpen?: boolean; 
       <div
         className="mc-patchnote-list"
         dangerouslySetInnerHTML={{
-          __html: patch.body.replaceAll('<br>', '').replaceAll('</br>', '') /* .replace(/(\s*\(\s*)((<a.+<\/a>))(\s*\)\s*)/g, (a, b, c, d, e) => {
-            return c;
-          }) */
+          __html: patch.body.replaceAll('<br>', '').replaceAll('</br>', '')
         }}
       ></div>
     </ModalDialog>

@@ -225,6 +225,7 @@
         flex-direction: column;
         column-gap: 1rem;
         right: 0;
+        animation: animPatchCardOpac 200ms ease-in;
 
         .totaltime,
         .lasttime {
@@ -232,6 +233,10 @@
           font-weight: normal;
           font-size: 0.8rem;
           text-align: end;
+        }
+
+        .lasttime.hide {
+          display: none;
         }
       }
     }
@@ -255,6 +260,9 @@
     right: 0;
     padding: 0.5rem 0;
     z-index: 200;
+    opacity: 0;
+    animation: slide-down 0.2s ease forwards;
+    transform: translateY(-10px);
   }
   
   .edit-btn {

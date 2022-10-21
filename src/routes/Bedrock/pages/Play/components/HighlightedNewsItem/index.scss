@@ -17,6 +17,7 @@
   }
 
   &.card-border .hl-news-item-inside::after {
+    pointer-events: none;
     content: '';
     position: absolute;
     display: block;
@@ -82,7 +83,7 @@
 
     p {
       font-family: 'Noto Sans';
-      font-size: 0.9rem;
+      font-size: 14.5px;
       color: hsl(0, 0%, 90%)
     }
   }

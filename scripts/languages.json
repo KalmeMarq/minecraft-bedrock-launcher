@@ -1,0 +1,32 @@
+[
+  {
+    "iso": "en",
+    "locale": "en-GB",
+    "localName": "English - United Kingdom"
+  },
+  {
+    "iso": "en",
+    "locale": "en-US",
+    "localName": "English - United States"
+  },
+  {
+    "iso": "es",
+    "locale": "es-ES",
+    "localName": "Español - España"
+  },
+  {
+    "iso": "es",
+    "locale": "es-MX",
+    "localName": "Español - México"
+  },
+  {
+    "iso": "pt",
+    "locale": "pt-BR",
+    "localName": "Português - Brasil"
+  },
+  {
+    "iso": "pt",
+    "locale": "pt-PT",
+    "localName": "Português - Portugal"
+  }
+]

@@ -1,15 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { useTranslation } from '../../../../hooks/useTranslation';
-import folderIcon from '../../../../assets/images/folder.png';
 import SearchBox from '../../../../components/SearchBox';
 import { T } from '../../../../context/TranslationContext';
 import Checkbox from '../../../../components/Checkbox';
 import LButton from '../../../../components/LButton';
-import { filesize } from 'filesize';
-import moreIcon from '../../../../assets/images/more.png';
 import './index.scss';
-import ReactModal from 'react-modal';
+import VersionItem from './components/VersionItem';
+import RemovePopup from './components/RemovePopup';
 
 interface VersionInfo {
   id: string;
@@ -17,95 +15,6 @@ interface VersionInfo {
   uuid: string;
   size: number;
 }
-
-export const DeletePopup: React.FC<{ isOpen?: boolean; onClose?: () => void; version: VersionInfo; onConfirm?: () => void }> = ({ isOpen = false, onClose, version, onConfirm }) => {
-  const { t } = useTranslation();
-
-  return (
-    <ReactModal isOpen={isOpen} className="modal-dialog delete-popup" shouldCloseOnOverlayClick={true} overlayClassName="modal-overlay delete-popup-overlay" onRequestClose={onClose}>
-      <div className="delete-popup-content">
-        <p className="question">
-          <T>Are you sure you want to delete?</T>
-        </p>
-        <p className="version-id">
-          <p>{version.id}</p> <p>{version.uuid}</p>
-        </p>
-        <div className="popup-buttons">
-          <LButton text={t('Cancel')} onClick={onClose} />
-          <LButton text={t('Delete')} type="red" onClick={onConfirm} />
-        </div>
-      </div>
-    </ReactModal>
-  );
-};
-
-const VersionItem: React.FC<{ info: VersionInfo; onRepair?: () => void; onFolder?: () => void; onRemove?: () => void }> = ({ info, onRepair, onFolder, onRemove }) => {
-  const [showTools, setShowTools] = useState(false);
-
-  const tRef = useRef(null);
-
-  const handleClickOutside = (ev: MouseEvent) => {
-    // @ts-ignore
-    if (tRef.current && !tRef.current.contains(ev.target)) {
-      setShowTools(false);
-    }
-  };
-
-  const handleClickOutsideWindow = (ev: FocusEvent) => {
-    setShowTools(false);
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    window.addEventListener('blur', handleClickOutsideWindow);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('blur', handleClickOutsideWindow);
-    };
-  }, []);
-
-  return (
-    <>
-      <div className="version-item">
-        <div tabIndex={0} className="version-btn">
-          <div className="version-info">
-            <p>
-              {info.id} {info.type === 'preview' && <span className={'tag preview'}>Preview</span>} {info.type === 'beta' && <span className={'tag beta'}>Beta</span>}
-            </p>
-            <span>{info.uuid}</span>
-            <span dir="ltr">{filesize(info.size) as string}</span>
-          </div>
-          <div className="version-item-tools">
-            <LButton text="Repair" type="green" />
-            <LButton icon={folderIcon} />
-            <LButton
-              icon={moreIcon}
-              onClick={(e) => {
-                e.preventDefault();
-                setShowTools(true);
-              }}
-            />
-            {showTools && (
-              <div ref={tRef} className="edit-tools">
-                <button
-                  className="edit-btn"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowTools(false);
-                    if (onRemove) onRemove();
-                  }}
-                >
-                  <T>Remove</T>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
 
 const Versions: React.FC = () => {
   const [versions, setVersions] = useState<VersionInfo[]>([
@@ -148,7 +57,7 @@ const Versions: React.FC = () => {
 
   return (
     <>
-      <DeletePopup
+      <RemovePopup
         isOpen={showDeletePopup}
         version={{ id: '', uuid: '', size: 0, type: 'release' }}
         onClose={() => {
