@@ -101,92 +101,9 @@
     pointer-events: none;
   }
 
-  // width: max-content;
-  // max-width: max-content;
-  // background: none;
-  // border: 1px solid transparent;
-  // color: rgb(255, 255, 255);
-  // cursor: pointer;
-  // outline: none;
-
-  // .inner {
-  //   display: block;
-  //   width: max-content;
-  //   max-width: max-content;
-  //   border: 1px solid #717171;
-  //   padding: 0.45rem 1rem 0.35rem;
-  //   height: 32px;
-  //   font-weight: 550;
-  //   font-size: 0.81rem;
-  // }
-
-  // .inner.iconned {
-  //   padding: 0.35rem 0.5rem;
-  // }
-
-  // .inner.green {
-  //   background: #008542;
-  //   border-color: #008542;
-  // }
-
-  // .inner.green:hover {
-  //   background: #0dd166;
-  //   border-color: #0dd166;
-  // }
-
-  // .inner.green:focus {
-  //   border: 1px solid white;
-  //   background: #0dd166;
-  // }
-
-  // .inner.green:active {
-  //   background: #006431;
-  // }
-
-  // .inner.red {
-  //   background: #a00202;
-  //   border-color: #a00202;
-  // }
-
-  // .inner.red:hover {
-  //   background: #d10d0d;
-  //   border-color: #d10d0d;
-  // }
-
-  // .inner.red:focus {
-  //   border: 1px solid white;
-  //   background: #d10d0d;
-  // }
-
-  // .inner.red:active {
-  //   background: #640000;
-  // }
-
-  // &:focus,
-  // &:focus-within {
-  //   border: 1px solid white;
-  //   background: hsl(0, 0%, 24%);
-
-  //   .inner {
-  //     background: transparent;
-  //   }
-  // }
-
-  // &:hover .inner {
-  //   background: #5c5c5c;
-  //   border-color: #8d8d8d;
-  // }
-
-  // &:active .inner {
-  //   background: #4f4f4f;
-  // }
-
-  // &:focus,
-  // &:focus-within {
-  //   border: 1px solid white;
-
-  //   .inner {
-  //     background: transparent;
-  //   }
-  // }
+  &.red:disabled .inner {
+    background: #a72a2a;
+    color: #e2a1a1;
+    border-color: #a72a2a;
+  }
 }

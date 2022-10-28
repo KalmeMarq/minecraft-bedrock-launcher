@@ -1,13 +1,14 @@
-use std::{path::PathBuf, collections::HashMap, fs::File};
+use std::{path::PathBuf, collections::HashMap, fs::File, sync::Mutex};
 
 use log::info;
 use serde::{Deserialize, Serialize};
+use tauri::Manager;
 use time::OffsetDateTime;
 
-use crate::{utils::{get_launcher_path, LauncherSave}, LauncherState};
+use crate::{utils::{LauncherSave, LauncherLoad, get_versions_path, get_version_manifest_v2}, LauncherState, CoreConfig, versions::VersionManifestV2};
 
-pub fn get_launcher_profiles_path() -> PathBuf {
-    get_launcher_path().join("launcher_profiles.json")
+fn get_launcher_profiles_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("launcher_profiles.json")
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -96,14 +97,33 @@ impl Default for LauncherProfiles {
 }
 
 impl LauncherSave for LauncherProfiles {
-    fn save(&self) {
+    fn save(&self, _app_handle: &tauri::AppHandle, core_config: &CoreConfig) {
         info!("Saving launcher profiles");
 
         serde_json::to_writer_pretty(
-            &File::create(get_launcher_profiles_path()).expect("Could not save launcher profiles file"), 
+            &File::create(get_launcher_profiles_path(&core_config.launcher_path)).expect("Could not save launcher profiles file"), 
             self
         ).expect("Could not save launcher profiles");
     } 
+}
+
+impl LauncherLoad<LauncherProfiles> for LauncherProfiles {
+    fn load(app_handle: &tauri::AppHandle, core_config: &CoreConfig) -> LauncherProfiles {
+        info!("Loading launcher profiles");
+
+        let profiles_path = get_launcher_profiles_path(&core_config.launcher_path);
+
+        let mut profiles: LauncherProfiles = LauncherProfiles::default();
+
+        if profiles_path.exists() {
+            let data = std::fs::read_to_string(profiles_path).expect("Could not read launcher profiles file");
+            profiles = serde_json::from_str(&data).expect("Could not load launcher profiles");
+        } else {
+            profiles.save(app_handle,core_config);
+        }
+
+        profiles
+    }
 }
 
 #[tauri::command]
@@ -213,19 +233,56 @@ pub fn delete_profile(state: tauri::State<LauncherState>, profile_id: String) ->
     }
 }
 
-pub fn load_profiles() -> LauncherProfiles {
-    info!("Loading launcher profiles");
+#[derive(Serialize, Debug, Clone)]
+pub struct ProgressStatusPreparing {
+    status: String
+}
 
-    let profiles_path = get_launcher_profiles_path();
+#[derive(Serialize, Debug, Clone)]
+pub struct ProgressStatusStop {
+    status: String
+}
 
-    let mut profiles: LauncherProfiles = LauncherProfiles::default();
+#[derive(Serialize, Debug, Clone)]
+pub struct ProgressStatusLaunching {
+    status: String
+}
 
-    if profiles_path.exists() {
-        let data = std::fs::read_to_string(profiles_path).expect("Could not read launcher profiles file");
-        profiles = serde_json::from_str(&data).expect("Could not load launcher profiles");
+#[derive(Serialize, Debug, Clone)]
+pub struct ProgressStatusDownloading {
+    status: String,
+    current_size: u32,
+    total_size: u32
+}
+
+#[derive(Serialize, Debug, Clone)]
+pub enum ProgressStatusPayload {
+    Preparing(ProgressStatusPreparing),
+    ProgressStatusDownloading(ProgressStatusDownloading),
+    Launching(ProgressStatusLaunching),
+    Stop(ProgressStatusStop)
+}
+
+#[tauri::command]
+async fn play_profile(app: tauri::AppHandle, window: tauri::Window, state: tauri::State<'_, LauncherState>, profile_id: String) -> Result<(), String> {
+    window.emit("progress_status", ProgressStatusPayload::Preparing(ProgressStatusPreparing { status: "preparing".into() })).unwrap();
+    
+    if let Some(profile) = state.profiles.lock().unwrap().profiles.get(&profile_id).as_mut() {
+        let vm_v2: VersionManifestV2 = serde_json::from_value(get_version_manifest_v2(app.state::<Mutex<CoreConfig>>()).await.unwrap()).unwrap();
+        
+        if let Some(uuid) = vm_v2.get_version_uuid(profile.version_id.clone(), "x64".into()) {
+            let ver_path = get_versions_path(&app.state::<Mutex<CoreConfig>>().lock().unwrap().launcher_path).join(vec![profile.version_id.clone(), uuid].join("-"));
+
+            // profile.icon = "".into();
+
+            if ver_path.exists() {
+
+            } else {
+            }
+        }
+
+        Ok(())
     } else {
-        profiles.save();
+        Err("Profile does not exist, idiot".into())
     }
-
-    profiles
 }

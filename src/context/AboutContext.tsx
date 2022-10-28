@@ -12,7 +12,7 @@ type OSInfo = {
 };
 
 export interface VersionManifestV2 {
-  lastest: {
+  latest: {
     release: string;
     beta: string;
     preview: string;
@@ -63,7 +63,7 @@ const defaultValue: {
     versions: []
   },
   versionManifestV2: {
-    lastest: {
+    latest: {
       release: '0.0.0',
       beta: '0.0.0',
       preview: '0.0.0'
@@ -91,7 +91,7 @@ export const AboutProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     versions: []
   });
   const [versionManifestV2, setVersionManifestV2] = useState<VersionManifestV2>({
-    lastest: {
+    latest: {
       release: '0.0.0',
       beta: '0.0.0',
       preview: '0.0.0'

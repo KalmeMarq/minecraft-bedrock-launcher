@@ -6,12 +6,14 @@ import { T } from '../../../../context/TranslationContext';
 import './index.scss';
 import translations from '../../../../assets/translations.json';
 import { banners, SettingsContext } from '../../../../context/SettingsContext';
+import { invoke } from '@tauri-apps/api';
 
 const General: React.FC = () => {
   const { keepLauncherOpen, animatePages, bannerTheme, setSetting, theme, language, themes, refreshThemes } = useContext(SettingsContext);
 
   const [forceRTL, setForceRTL] = useState(false);
   const [beforeForced, setBeforeForced] = useState('ltr');
+  const [storePath, setStorePath] = useState('launcherPath');
 
   return (
     <div className="settings-general-content">
@@ -102,6 +104,38 @@ const General: React.FC = () => {
           console.log(prop, checked);
         }}
       />
+      <div>
+        <h3 style={{ marginBottom: '8px', marginTop: '2rem' }}>
+          <T>Storage Directory</T>
+        </h3>
+        <div className="store-path-cont">
+          <span onCopy={(e) => e.preventDefault()}>{storePath}</span>
+          <button
+            className="browse-btn"
+            onClick={() => {
+              invoke('pick_folder', { defaultFolder: storePath }).then((selected) => {
+                if (selected != null && typeof selected === 'string' && selected !== '') {
+                  setStorePath(selected);
+                }
+              });
+            }}
+          >
+            Browse
+          </button>
+        </div>
+        <div style={{ height: '8px' }}></div>
+        <p style={{ fontSize: '14px', marginBottom: '6px', fontStyle: 'italic', fontFamily: 'Noto Sans' }}>*You'll need to restart the app to take effect. It also may take a little bit.</p>
+        <LButton
+          type="red"
+          text="Apply"
+          disabled={storePath === 'launcherPath'}
+          onClick={() => {
+            if (storePath !== 'launcherPath' && storePath !== '') {
+              invoke('change_launcher_path', { newLauncherPath: storePath });
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };

@@ -73,11 +73,11 @@ const InstallationItem: React.FC<{
           {versionManifestV2 != null && (
             <span>
               {profile.versionId === 'latest-release'
-                ? versionManifestV2.lastest.release
+                ? versionManifestV2.latest.release
                 : profile.versionId === 'latest-beta'
-                ? versionManifestV2.lastest.beta
+                ? versionManifestV2.latest.beta
                 : profile.versionId === 'latest-preview'
-                ? versionManifestV2.lastest.preview
+                ? versionManifestV2.latest.preview
                 : profile.name}
             </span>
           )}

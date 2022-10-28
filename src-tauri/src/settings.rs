@@ -4,12 +4,11 @@ use log::info;
 use ::serde::{Serialize, Deserialize};
 use tauri::State;
 
-use crate::{utils::{get_launcher_path, LauncherSave}, LauncherState};
+use crate::{utils::{LauncherSave, LauncherLoad}, LauncherState, CoreConfig};
 
-pub fn get_launcher_settings_path() -> PathBuf {
-    get_launcher_path().join("launcher_settings.json")
+pub fn get_launcher_settings_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("launcher_settings.json")
 }
-
 fn bool_true() -> bool {
     true
 }
@@ -226,11 +225,32 @@ impl LauncherSettings {
 }
 
 impl LauncherSave for LauncherSettings {
-    fn save(&self) {
+    fn save(&self, _app_handle: &tauri::AppHandle, core_config: &CoreConfig) {
+        info!("Saving launcher settings");
+
         serde_json::to_writer_pretty(
-            &File::create(get_launcher_settings_path()).expect("Could not save launcher settings file"), 
+            &File::create(get_launcher_settings_path(&core_config.launcher_path)).expect("Could not save launcher settings file"), 
             self
         ).expect("Could not save launcher settings");
+    }
+}
+
+impl LauncherLoad<LauncherSettings> for LauncherSettings {
+    fn load(app_handle: &tauri::AppHandle, core_config: &CoreConfig) -> LauncherSettings {
+        info!("Loading launcher settings");
+
+        let settings_path = get_launcher_settings_path(&core_config.launcher_path);
+
+        let mut settings: LauncherSettings = LauncherSettings::default();
+
+        if settings_path.exists() {
+            let data = fs::read_to_string(settings_path).expect("Could not read launcher settings");
+            settings = serde_json::from_str(&data).expect("Could not load launcher settings");
+        } else {
+            settings.save(app_handle, core_config);
+        }
+
+        settings
     }
 }
 
@@ -292,19 +312,19 @@ pub fn get_setting(state: State<LauncherState>, option: &str) -> String {
    } 
 }
 
-pub fn load_settings() -> LauncherSettings {
-    info!("Loading launcher settings");
+// pub fn load_settings() -> LauncherSettings {
+//     info!("Loading launcher settings");
 
-    let settings_path = get_launcher_settings_path();
+//     let settings_path = get_launcher_settings_path();
 
-    let mut settings: LauncherSettings = LauncherSettings::default();
+//     let mut settings: LauncherSettings = LauncherSettings::default();
 
-    if settings_path.exists() {
-        let data = fs::read_to_string(settings_path).expect("Could not read launcher settings");
-        settings = serde_json::from_str(&data).expect("Could not load launcher settings");
-    } else {
-        settings.save();
-    }
+//     if settings_path.exists() {
+//         let data = fs::read_to_string(settings_path).expect("Could not read launcher settings");
+//         settings = serde_json::from_str(&data).expect("Could not load launcher settings");
+//     } else {
+//         settings.save();
+//     }
 
-    settings
-}
+//     settings
+// }

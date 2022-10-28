@@ -1,56 +1,67 @@
-use std::{path::PathBuf, fs::{self, File}, process::Command, io::Write};
+use std::{path::PathBuf, fs::{self, File, read_to_string}, process::Command, io::Write, sync::Mutex, env::temp_dir};
 
 use log::info;
 use log4rs::config::RawConfig;
-use tauri::regex::Regex;
+use reqwest::StatusCode;
+use tauri::{regex::Regex, api::{dialog::blocking::FileDialogBuilder, dir::with_temp_dir}};
 
-pub fn get_launcher_path() -> PathBuf {
-    dirs::data_dir().unwrap().join(".minecraft_bedrock_launcher")
+use crate::CoreConfig;
+
+pub fn get_cache_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("webcache")
 }
 
-pub fn get_cache_path() -> PathBuf {
-    get_launcher_path().join("webcache")
+pub fn get_versions_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("versions")
 }
 
-pub fn get_versions_path() -> PathBuf {
-    get_launcher_path().join("versions")
+pub fn get_installations_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("installations")
 }
 
-pub fn get_installations_path() -> PathBuf {
-    get_launcher_path().join("installations")
+pub fn get_themes_path(launcher_path: &PathBuf) -> PathBuf {
+    launcher_path.join("themes")
 }
 
-pub fn get_themes_path() -> PathBuf {
-    get_launcher_path().join("themes")
+pub fn get_temp_path() -> PathBuf {
+    let path = temp_dir().join("minicraft_launcher");
+
+    if !path.exists() {
+        fs::create_dir(&path).expect("Could not create temp directory");
+    }
+
+    path
 }
 
-pub fn create_launcher_dirs() {
-    if !get_launcher_path().exists() {
-        fs::create_dir(get_launcher_path()).expect("Could not create launcher directory");
+pub fn create_launcher_dirs(launcher_path: &PathBuf) {
+    info!("Creating launcher dirs");
+
+    if !launcher_path.exists() {
+        fs::create_dir(launcher_path).expect("Could not create launcher directory");
     }
     
-    if !get_versions_path().exists() {
-        fs::create_dir(get_versions_path()).expect("Could not create versions directory");
+    if !get_versions_path(launcher_path).exists() {
+        fs::create_dir(get_versions_path(launcher_path)).expect("Could not create versions directory");
     }
 
-    if !get_installations_path().exists() {
-        fs::create_dir(get_installations_path()).expect("Could not create installations directory");
+    if !get_installations_path(launcher_path).exists() {
+        fs::create_dir(get_installations_path(launcher_path)).expect("Could not create installations directory");
     }
 
-    if !get_themes_path().exists() {
-        fs::create_dir(get_themes_path()).expect("Could not create themes directory");
+    if !get_themes_path(launcher_path).exists() {
+        fs::create_dir(get_themes_path(launcher_path)).expect("Could not create themes directory");
     }
 }
 
-pub fn init_logger(app: tauri::AppHandle) {
+pub fn init_logger(app: tauri::AppHandle, core_config: &CoreConfig) {
     info!("Initializing logger");
 
     let log_config_path = app.path_resolver().resolve_resource("resources/log4rs.yml").expect("failed to resolve log4rs.yml resource");
 
-    let binding = get_launcher_path().join("launcher_log.txt");
+    let binding = core_config.launcher_path.join("launcher_log.txt");
     
     let log_file_path = binding.to_str().unwrap().replace("\\", "/");
-    let log_config_str = fs::read_to_string(&log_config_path).unwrap();
+    let log_config_str = read_to_string(&log_config_path).unwrap();
 
     let re = Regex::new(r"%LOG_FILE_PATH%").unwrap();
     let log_config = re.replace_all(&log_config_str, log_file_path);
@@ -71,45 +82,71 @@ pub fn open_folder(path: PathBuf) {
 }
 
 pub trait LauncherSave {
-    fn save(&self);
+    fn save(&self, app_handle: &tauri::AppHandle, core_config: &CoreConfig);
+}
+
+pub trait LauncherLoad<T> {
+    fn load(app_handle: &tauri::AppHandle, core_config: &CoreConfig) -> T; 
 }
 
 #[tauri::command]
-pub async fn get_news_minecraft() -> serde_json::Value {
-    get_json_cached_file(get_cache_path().join("ndo"), "https://launchercontent.mojang.com/news.json", 60).await
+pub fn pick_folder(default_folder: String) -> Result<String, ()> {
+    let dialog = FileDialogBuilder::new().set_directory(PathBuf::from(default_folder));
+    let dir_path = dialog.pick_folder();
+
+    match dir_path {
+        Some(value) => Ok(value.to_str().unwrap().to_string()),
+        None => Ok("".into())
+    }
 }
 
 #[tauri::command]
-pub async fn get_news_minecraft_forum() -> String {
-    get_text_cached_file(get_cache_path().join("ndgo"), "https://www.minecraftforum.net/news.rss", 60).await
+pub async fn get_news_minecraft(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<serde_json::Value, ()> {
+    let pn_path = get_cache_path(&state.lock().unwrap().launcher_path).join("ndo");
+    let data = get_json_cached_file(pn_path, "https://launchercontent.mojang.com/news.json", 60).await;
+    Ok(data)
 }
 
 #[tauri::command]
-pub async fn get_news_minecraft_top() -> String {
-    get_text_cached_file(get_cache_path().join("nduo"), "https://minecrafttop.com/news/rss", 60).await
+pub async fn get_news_minecraft_forum(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<String, ()> {
+    let pn_path = get_cache_path(&state.lock().unwrap().launcher_path).join("ndgo");
+    let data = get_text_cached_file(pn_path, "https://www.minecraftforum.net/news.rss", 60).await;
+    Ok(data)
 }
 
 #[tauri::command]
-pub async fn get_launcher_patch_notes() -> serde_json::Value {
-    get_json_cached_file(get_cache_path().join("mqo"), "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/launcherPatchNotes.json", 60).await
+pub async fn get_news_minecraft_top(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<String, ()> {
+    let pn_path = get_cache_path(&state.lock().unwrap().launcher_path).join("nduo");
+    let data = get_text_cached_file(pn_path, "https://minecrafttop.com/news/rss", 60).await;
+    Ok(data)
 }
 
 #[tauri::command]
-pub async fn get_bedrock_patch_notes() -> serde_json::Value {
-    let pn_path = get_cache_path().join("nqro");
-    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/bedrockPatchNotes.json", 60).await
+pub async fn get_launcher_patch_notes(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<serde_json::Value, ()> {
+    let pn_path = get_cache_path(&state.lock().unwrap().launcher_path).join("mqo");
+    let data = get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/launcherPatchNotes.json", 60).await;
+    Ok(data)
 }
 
 #[tauri::command]
-pub async fn get_version_manifest() -> serde_json::Value {
-    let pn_path = get_versions_path().join("version_manifest.json");
-    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest.json", 60).await
+pub async fn get_bedrock_patch_notes(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<serde_json::Value, ()> {
+    let pn_path = get_cache_path(&state.lock().unwrap().launcher_path).join("nqro");
+    let data = get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/patchnotes/bedrockPatchNotes.json", 60).await;
+    Ok(data)
 }
 
 #[tauri::command]
-pub async fn get_version_manifest_v2() -> serde_json::Value {
-    let pn_path = get_versions_path().join("version_manifest_v2.json");
-    get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest_v2.json", 60).await
+pub async fn get_version_manifest(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<serde_json::Value, ()> {
+    let pn_path = get_versions_path(&state.lock().unwrap().launcher_path).join("version_manifest.json");
+    let data = get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest.json", 60).await;
+    Ok(data)
+}
+
+#[tauri::command]
+pub async fn get_version_manifest_v2(state: tauri::State<'_, Mutex<CoreConfig>>) -> Result<serde_json::Value, ()> {
+    let pn_path = get_versions_path(&state.lock().unwrap().launcher_path).join("version_manifest_v2.json");
+    let data = get_json_cached_file(pn_path, "https://github.com/KalmeMarq/minecraft-bedrock-launcher-content/raw/master/version_manifest_v2.json", 60).await;
+    Ok(data)
 }
 
 pub async fn get_json_from_url(request_url: &str) -> serde_json::Value {
@@ -134,6 +171,60 @@ pub async fn get_text_from_url(request_url: &str) -> String {
     data
 }
 
+pub async fn get_json_from_url_if_modified(request_url: &str) -> Option<serde_json::Value> {
+    let client = reqwest::Client::new();
+    let reg = Regex::new(r"\+\d{4}").unwrap();
+
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert(reqwest::header::IF_MODIFIED_SINCE, reg.replace_all(&chrono::Utc::now().to_rfc2822().to_string(), "GMT").parse().unwrap());
+    headers.insert(reqwest::header::EXPIRES, "-1".parse().unwrap());
+    headers.insert(reqwest::header::CACHE_CONTROL, "must-revalidate, private".parse().unwrap());
+   
+    let res = client
+        .get(request_url)
+        .headers(headers)
+        .send().await.ok();
+
+    if let Some(response) = res {
+        if response.status() == StatusCode::NOT_MODIFIED {
+            None
+        } else if response.status() == StatusCode::OK {
+            Some(serde_json::from_str(&response.text().await.expect("Could not get text file")).expect("Could not parse json"))
+        } else {
+            None
+        }
+    } else {
+        None
+    }    
+}
+
+pub async fn get_text_from_url_if_modified(request_url: &str) -> Option<String> {
+    let client = reqwest::Client::new();
+    let reg = Regex::new(r"\+\d{4}").unwrap();
+
+    let mut headers = reqwest::header::HeaderMap::new();
+    headers.insert(reqwest::header::IF_MODIFIED_SINCE, reg.replace_all(&chrono::Utc::now().to_rfc2822().to_string(), "GMT").parse().unwrap());
+    headers.insert(reqwest::header::EXPIRES, "-1".parse().unwrap());
+    headers.insert(reqwest::header::CACHE_CONTROL, "must-revalidate, private".parse().unwrap());
+   
+    let res = client
+        .get(request_url)
+        .headers(headers)
+        .send().await.ok();
+
+    if let Some(response) = res {
+        if response.status() == StatusCode::NOT_MODIFIED {
+            None
+        } else if response.status() == StatusCode::OK {
+            Some(response.text().await.expect("Could not get text file"))
+        } else {
+            None
+        }
+    } else {
+        None
+    }    
+}
+
 pub fn save_json_to_file(file_path: PathBuf, data: &serde_json::Value) {
     serde_json::to_writer_pretty(
         &File::create(&file_path).expect("Could not create file"),
@@ -148,7 +239,6 @@ pub fn save_text_to_file(file_path: PathBuf, data: &String) {
     file.flush().unwrap();
 }
 
-// TODO: Instead of checking every given minutes, use If-Modified-Since header. It doesn't wastes the rate limit. If not modified then used the stored file
 pub async fn get_json_cached_file(file_path: PathBuf, request_url: &str, minutes_to_wait: u64) -> serde_json::Value {
     if file_path.exists() {
         let metadata = std::fs::metadata(&file_path)
@@ -157,10 +247,17 @@ pub async fn get_json_cached_file(file_path: PathBuf, request_url: &str, minutes
         let dur = metadata.modified().unwrap().elapsed().unwrap();
 
         if dur.as_secs() / 60 > minutes_to_wait {
-            let data = get_json_from_url(request_url).await;
-            save_json_to_file(file_path, &data);
-
-            data
+            let data = get_json_from_url_if_modified(request_url).await;
+            
+            if let Some(d) = data {
+                save_json_to_file(file_path, &d);
+                d
+            } else {
+                let data = fs::read_to_string(&file_path).expect("Could not read cached file");
+                let json: serde_json::Value =
+                    serde_json::from_str(&data).expect("Could not jsonify file");
+                json
+            }
         } else {
             let data = fs::read_to_string(&file_path).expect("Could not read cached file");
             let json: serde_json::Value =
@@ -175,7 +272,6 @@ pub async fn get_json_cached_file(file_path: PathBuf, request_url: &str, minutes
     }
 }
 
-// TODO: Instead of checking every given minutes, use If-Modified-Since header. It doesn't wastes the rate limit. If not modified then used the stored file
 pub async fn get_text_cached_file(file_path: PathBuf, request_url: &str, minutes_to_wait: u64) -> String {
     if file_path.exists() {
         let metadata = std::fs::metadata(&file_path)
@@ -184,10 +280,15 @@ pub async fn get_text_cached_file(file_path: PathBuf, request_url: &str, minutes
         let dur = metadata.modified().unwrap().elapsed().unwrap();
 
         if dur.as_secs() / 60 > minutes_to_wait {
-            let data = get_text_from_url(request_url).await;
-            save_text_to_file(file_path, &data);
-         
-            data
+            let data = get_text_from_url_if_modified(request_url).await;
+            
+            if let Some(d) = data {
+                save_text_to_file(file_path, &d);
+                d
+            } else {
+                let data = fs::read_to_string(&file_path).expect("Could not read cached file");
+                data
+            }
         } else {
             let data = fs::read_to_string(&file_path).expect("Could not read cached file");
             data
